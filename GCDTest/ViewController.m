@@ -18,7 +18,7 @@
 {
     [super viewDidLoad];
 
-    [self maxThreadCountTest];
+    [self test3];
 }
 
 //测试何时死锁
@@ -90,14 +90,14 @@
     dispatch_async(concurrentQueue, ^{
         for (int i = 0; i < 3; i++)
         {
-            NSLog(@"并发异步 1   %@",[NSThread currentThread]);
+            NSLog(@"异步读取 1   %@",[NSThread currentThread]);
         }
     });
-    
+
     dispatch_async(concurrentQueue, ^{
         for (int i = 0; i < 3; i++)
         {
-            NSLog(@"并发异步 2   %@",[NSThread currentThread]);
+            NSLog(@"异步读取 2   %@",[NSThread currentThread]);
         }
     });
     
@@ -105,34 +105,27 @@
     //dispatch_barrier_async: 不等待栅栏block里面的代码运行完毕，继续向后执行，把block插入到queue中。等待栅栏前任务和栅栏任务执行完毕，再执行已经添加到队列里的3、4、5
     //所以，dispatch_barrier_async的不阻塞当前线程,dispatch_barrier_sync阻塞。
     dispatch_barrier_async(concurrentQueue, ^{
-        NSLog(@"栅栏函数 -----------  %@",[NSThread currentThread]);
+        NSLog(@"栅栏函数 --- 写入 ---  %@",[NSThread currentThread]);
     });
-    
-    dispatch_sync(concurrentQueue, ^{
+
+    dispatch_async(concurrentQueue, ^{
         for (int i = 0; i < 3; i++)
         {
-            NSLog(@"同步写入 3-%d   %@",i, [NSThread currentThread]);
+            NSLog(@"异步读取 4   %@",[NSThread currentThread]);
         }
     });
     
     dispatch_async(concurrentQueue, ^{
         for (int i = 0; i < 3; i++)
         {
-            NSLog(@"并发异步 4   %@",[NSThread currentThread]);
+            NSLog(@"异步读取 5   %@",[NSThread currentThread]);
         }
     });
     
     dispatch_async(concurrentQueue, ^{
         for (int i = 0; i < 3; i++)
         {
-            NSLog(@"并发异步 5   %@",[NSThread currentThread]);
-        }
-    });
-    
-    dispatch_async(concurrentQueue, ^{
-        for (int i = 0; i < 3; i++)
-        {
-            NSLog(@"并发异步 6   %@",[NSThread currentThread]);
+            NSLog(@"异步读取 6   %@",[NSThread currentThread]);
         }
     });
     
